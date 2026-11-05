@@ -90,12 +90,13 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 @media (prefers-reduced-motion: reduce) { .lado { transition: none; } }
 </style>
 
+<style>.voltar-inicio{display:inline-block;margin:0 0 12px;padding:4px 12px;border:1px solid #d8cfb8;border-radius:999px;background:#fff;color:#b5462a;font:600 13px system-ui,sans-serif;text-decoration:none}.voltar-inicio:hover{border-color:#b5462a}.abas .voltar-inicio{display:none;margin:0 0 6px}@media (max-width:800px){.lado .voltar-inicio{display:none}.abas .voltar-inicio{display:inline-block}}@media print{.voltar-inicio{display:none!important}}</style>
 </head>
 <body>
-<a href="./" class="voltar-inicio">← Início</a><style>.voltar-inicio{position:fixed;top:10px;right:14px;z-index:10;padding:4px 12px;border:1px solid #d8cfb8;border-radius:999px;background:#fff;color:#b5462a;font:600 13px system-ui,sans-serif;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.08)}@media (max-width:767px){.voltar-inicio{top:auto;bottom:14px;padding:8px 14px}}@media print{.voltar-inicio{display:none}}</style>
 <div class="kit">
   <aside class="lado" id="lado" aria-label="Navegação">
-    <div class="marca">Kit <b>IA</b></div>
+    <a href="./" class="voltar-inicio">← Início</a>
+<div class="marca">Kit <b>IA</b></div>
     <input class="busca" id="busca" type="search" placeholder="Buscar…" aria-label="Buscar nas fichas">
     <div class="contagem" id="contagem" aria-live="polite"></div>
     <div class="seg" role="group" aria-label="Organizar o menu">
@@ -106,6 +107,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
   </aside>
   <div class="principal" id="principal">
     <nav class="abas" aria-label="Seções">
+<a href="./" class="voltar-inicio">← Início</a>
       <a href="#/" data-aba="fichas">Fichas</a>
       <a href="#/glossario" data-aba="glossario">Glossário</a>
       <a href="#/cola" data-aba="cola">Cola rápida</a>
