@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia do que eu uso no Claude Code</title>
+<style>
+:root {
+  --destaque: #b5462a; --papel: #fbf8f1; --borda: #e5dfd0; --borda-forte: #d8cfb8;
+  --tinta: #2a2620; --suave: #7a705c;
+  --leve: color-mix(in srgb, var(--destaque) 12%, var(--papel));
+  --serifa: Georgia, "Iowan Old Style", serif;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 40px 16px 56px; }
+h1 { font: 600 30px/1.2 var(--serifa); margin: 0 0 4px; }
+.data { color: var(--suave); font-size: 13px; margin: 0 0 18px; }
+h2 { font: 600 21px var(--serifa); margin: 30px 0 6px; padding-bottom: 4px; border-bottom: 2px solid var(--destaque); }
+h2 + p { color: var(--suave); }
+p { margin: 0 0 8px; }
+p strong { color: var(--destaque); }
+ul { margin: 4px 0 12px; padding-left: 20px; }
+li { margin: 3px 0; }
+li::marker { color: var(--destaque); }
+code { font: 13px var(--mono); background: color-mix(in srgb, var(--borda) 60%, transparent); padding: 1px 4px; border-radius: 4px; }
+.rodape { margin-top: 32px; padding-top: 10px; border-top: 1px solid var(--borda); color: var(--suave); font-size: 12.5px; }
+@page { size: A4; margin: 16mm 14mm; }
+@media print {
+  body { background: #fff; font-size: 11pt; }
+  main { max-width: none; padding: 0; }
+  h2 { break-after: avoid; }
+  li, h2 + p { break-inside: avoid; }
+  .rodape { display: none; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Guia do que eu uso no Claude Code</h1>
+<p class="data">Atualizado em 05/11/2026</p>
+<p>Os recursos que eu tenho instalados no Claude Code, por tipo. Cada tipo abre com uma explicação curta; a ficha completa está no Kit IA.</p>
+<h2>Plugins</h2>
+<p>Pacotes que juntam skills, hooks, subagentes e conectores numa instalação só.</p>
+<ul>
+<li><strong>fluxo-geral</strong> (meu): hooks que valem para qualquer projeto: formatação com ruff, proteção de segredos, confirmação antes de comandos destrutivos, notificações, passagem automática entre sessões, log de comandos e testes ao parar. Detalhes na seção Hooks.</li>
+<li><strong>superpowers</strong> (15 skills): métodos de trabalho para programar com o Claude. Exemplos: <code>brainstorming</code> (explorar a ideia antes de construir), <code>test-driven-development</code>, <code>systematic-debugging</code>, <code>verification-before-completion</code> (provar que funciona antes de dizer que terminou), <code>writing-plans</code>.</li>
+<li><strong>mattpocock-skills</strong> (39 skills): engenharia de verdade, sem "vibe coding". Exemplos: <code>grill-me</code> (entrevista que aperta um plano até ele ficar firme), <code>to-spec</code> e <code>to-tickets</code> (transformar conversa em especificação e tarefas), <code>tdd</code>, <code>code-review</code>, <code>handoff</code> (documento para outra sessão continuar).</li>
+<li><strong>marketing-skills</strong> (50 skills): marketing e crescimento. Exemplos: <code>copywriting</code>, <code>seo-audit</code>, <code>ads</code>, <code>pricing</code>, <code>launch</code>, <code>cold-email</code>.</li>
+<li><strong>ui-ux-pro-max</strong> (7 skills): design de interface com uma base de estilos, paletas, pares de fontes e gráficos. Exemplos: <code>ui-ux-pro-max</code>, <code>design-system</code>, <code>brand</code>, <code>slides</code>.</li>
+<li><strong>brag</strong> (2 skills): transforma o projeto atual num vídeo curto de lançamento.</li>
+</ul>
+<h2>Hooks</h2>
+<p>Comandos que o próprio programa roda sozinho em momentos fixos (antes ou depois de uma ação, ao abrir ou fechar a sessão), sem depender de o Claude lembrar.</p>
+<p><strong>Meus:</strong></p>
+<ul>
+<li>Ao abrir a sessão, atualiza o catálogo de todas as skills instaladas.</li>
+<li>Ao abrir a sessão, atualiza o inventário de recursos.</li>
+<li>Depois que a conversa é compactada, devolve ao Claude os lembretes fixos, o estado do git e os meus últimos pedidos.</li>
+<li>Depois de editar um arquivo, confere a sintaxe de <code>.sh</code> e <code>.json</code> e roda o eslint; se houver erro, devolve ao Claude.</li>
+</ul>
+<p><strong>Do plugin fluxo-geral:</strong></p>
+<ul>
+<li>Ao abrir a sessão, mostra o ramo, as alterações, os commits e a última passagem automática.</li>
+<li>Protege segredos: bloqueia a leitura de <code>.env</code>, chaves e credenciais, e pergunta antes de editá-los. Pede confirmação antes de comandos destrutivos (<code>rm</code> recursivo, <code>push --force</code>, <code>reset --hard</code>...).</li>
+<li>Registra cada comando de terminal num log.</li>
+<li>Depois de editar um arquivo Python, roda o ruff e devolve os erros ao Claude.</li>
+<li>Ao terminar, roda os testes rápidos do projeto (se o projeto tiver o arquivo de testes rápidos); se falharem, o Claude continua para corrigir.</li>
+<li>Notificação no desktop quando o Claude pede permissão ou espera resposta, e quando uma tarefa de 2 minutos ou mais termina.</li>
+<li>Antes de compactar e ao fechar a sessão, grava uma passagem automática (ramo, alterações, commits, últimos pedidos).</li>
+</ul>
+<p><strong>Do plugin superpowers:</strong></p>
+<ul>
+<li>Ao abrir a sessão, carrega a introdução do plugin, que ensina o Claude a usar as skills dele.</li>
+</ul>
+<h2>Subagentes</h2>
+<p>Assistentes especializados que o Claude chama para uma tarefa; cada um trabalha com o próprio contexto e devolve só o resultado.</p>
+<ul>
+<li><strong>investigador-de-bugs</strong>: investiga um erro, teste falhando, resultado errado ou lentidão com método (reproduzir, hipóteses, prova) e devolve a causa com evidência e a correção mínima. Não altera o código.</li>
+<li><strong>passador-de-sessao</strong>: reescreve o documento de retomada do projeto (o que foi feito, estado atual, próximos passos) para a próxima conversa saber onde parou.</li>
+<li><strong>pesquisador-web</strong>: pesquisa na web em fontes primárias (documentação oficial, órgão público, fabricante) e devolve uma resposta curta com cada afirmação ligada à fonte.</li>
+<li><strong>revisor-de-codigo</strong>: revisa as mudanças antes do commit, procurando bugs reais, mudança além do pedido, complexidade desnecessária e falta de teste. Só aponta, não altera.</li>
+</ul>
+<h2>Skills pessoais</h2>
+<p>Pastas com instruções que ensinam o Claude a fazer um tipo de tarefa de um jeito específico. Ele usa sozinho quando o pedido combina, ou você chama com <code>/nome</code>.</p>
+<p><strong>Pensamento e planejamento</strong></p>
+<ul>
+<li><code>analise-critica</code>: diagnóstico de uma empresa ou área com base em evidências (documentos, reuniões, dados públicos); aponta problemas com causa raiz e propõe iniciativas com 5W2H e metas SMART.</li>
+<li><code>brainstorming</code>: explora a intenção, os requisitos e o desenho antes de construir qualquer coisa.</li>
+<li><code>grill-me</code>: entrevista insistente para deixar um plano ou desenho mais firme.</li>
+<li><code>wayfinder</code>: planeja um trabalho grande demais para uma sessão como um mapa de decisões, resolvidas uma de cada vez.</li>
+<li><code>recursos</code>: depois de planejar um projeto, avalia quais hooks, subagentes, skills, plugins e conectores instalados valem a pena usar e aponta o que falta.</li>
+</ul>
+<p><strong>Desenvolvimento</strong></p>
+<ul>
+<li><code>diagnosing-bugs</code>: ciclo de diagnóstico para bugs difíceis e perdas de desempenho.</li>
+<li><code>karpathy-guidelines</code>: regras para evitar erros comuns de IA ao programar: não complicar, mudar só o necessário, deixar claras as suposições, definir como verificar.</li>
+<li><code>graphify</code>: transforma código, documentos ou imagens num grafo de conhecimento para responder perguntas sobre a estrutura de um projeto.</li>
+<li><code>write-swift</code>: como escrever Swift moderno bem.</li>
+</ul>
+<p><strong>Design e interface</strong></p>
+<ul>
+<li><code>apple-design</code>: o jeito da Apple de desenhar interfaces e movimento, adaptado para a web.</li>
+<li><code>emil-design-eng</code>: a filosofia de Emil Kowalski sobre acabamento de interface e os detalhes que fazem um software parecer bom.</li>
+<li><code>break-ui</code>: tenta quebrar uma tela com dados no pior caso (nomes enormes, campos vazios, emoji, números extremos) e lista o que quebrou, com a correção.</li>
+<li><code>prototype</code>: constrói várias versões diferentes de um pedaço de interface para você comparar ao vivo e escolher. Só roda quando chamada.</li>
+<li><code>pick-ui-library</code>: escolhe a biblioteca certa para uma tarefa de frontend a partir de uma lista selecionada. Só roda quando chamada.</li>
+<li><code>mobile-native</code>: ajustes de CSS e meta tags para um site no celular parecer um app instalado.</li>
+<li><code>ask-sonner</code>: guia da biblioteca Sonner, de notificações (toasts) em React.</li>
+</ul>
+<p><strong>Animação</strong></p>
+<ul>
+<li><code>animate</code>: cria uma animação do zero, decidindo na ordem certa se deve animar, com que propósito, ferramenta, curva e duração.</li>
+<li><code>animate-expo</code>: o mesmo para apps em React Native e Expo.</li>
+<li><code>improve-animations</code>: audita as animações de um projeto e escreve um plano de melhorias priorizado. Não altera o código.</li>
+<li><code>review-animations</code>: revisa código de animação com um padrão alto de qualidade.</li>
+<li><code>find-animation-opportunities</code>: procura lugares que deveriam ter animação (e descarta os que não deveriam). Só propõe.</li>
+<li><code>animation-vocabulary</code>: descobre o nome certo de um efeito de animação a partir de uma descrição vaga.</li>
+</ul>
+<p><strong>Vídeo (HyperFrames)</strong></p>
+<ul>
+<li><code>hyperframes</code>: ponto de entrada para criar, editar ou renderizar vídeos e animações com HyperFrames.</li>
+<li><code>general-video</code>: vídeos mais longos ou com várias cenas: reels de marca, montagens, cartões de título.</li>
+<li><code>hyperframes-animation</code>: todo o conhecimento de animação para os vídeos (regras de movimento, cenas, transições).</li>
+<li><code>hyperframes-audio</code>: mixagem do áudio do vídeo (fades, volume, música sob a narração, efeitos).</li>
+<li><code>hyperframes-cli</code>: o ciclo de trabalho pela linha de comando do HyperFrames (criar, conferir, prévia, renderizar, publicar).</li>
+<li><code>hyperframes-core</code>: as regras de estrutura de um projeto HyperFrames.</li>
+<li><code>hyperframes-creative</code>: direção criativa (paleta, tipografia, narração, ritmo).</li>
+<li><code>hyperframes-keyframes</code>: zoom, movimento de câmera e outras transições quadro a quadro.</li>
+<li><code>hyperframes-registry</code>: busca e instala blocos visuais prontos (efeitos, gráficos, transições).</li>
+<li><code>hyperframes-studio</code>: trabalhar junto com uma pessoa no Studio do HyperFrames, do plano ao storyboard.</li>
+<li><code>media-use</code>: resolve toda mídia do vídeo (música, efeitos sonoros, imagens, ícones, logos, voz).</li>
+</ul>
+<p><strong>LinkedIn</strong></p>
+<ul>
+<li><code>li-post</code>: escreve um post a partir de uma ideia solta, com opções de gancho, na voz da pessoa e sem cara de IA.</li>
+<li><code>li-plan</code>: planeja a semana: o que postar, quando e com quem interagir.</li>
+<li><code>li-carousel</code>: monta um carrossel (post em documento), slide por slide.</li>
+<li><code>li-repurpose</code>: transforma um conteúdo longo (vídeo, podcast, newsletter) numa semana de posts.</li>
+<li><code>li-comment</code>: escreve comentários em posts de outras pessoas, com opinião, sem parecer robô.</li>
+<li><code>li-reply</code>: rascunha respostas aos comentários dos seus posts, por ordem de importância.</li>
+<li><code>li-dm</code>: convites de conexão e mensagens de acompanhamento que recebem resposta.</li>
+<li><code>li-inbox</code>: organiza a caixa de mensagens em contatos comerciais, recrutadores, colegas e spam, com rascunhos de resposta.</li>
+<li><code>li-profile</code>: dá nota ao perfil numa escala de 100 e reescreve o que perde pontos.</li>
+<li><code>li-audit</code>: analisa o que você já publicou: o que funcionou, por quê e o que parar de fazer.</li>
+<li><code>li-human</code>: tira as marcas de texto de máquina de qualquer rascunho e confere se ainda parece IA.</li>
+</ul>
+<h2>Conectores</h2>
+<p>Ligações entre o Claude e outros serviços. Ele age com a sua conta: vê e pode alterar o que você pode ver e alterar.</p>
+<ul>
+<li><strong>Google Drive</strong>: procura e lê documentos, planilhas e apresentações.</li>
+<li><strong>Gmail</strong>: procura e lê e-mails, e prepara rascunhos.</li>
+<li><strong>Google Agenda</strong>: consulta compromissos e sugere horários.</li>
+<li><strong>Perplexity</strong>: pesquisa na web e responde com as fontes citadas.</li>
+<li><strong>Firecrawl</strong>: lê páginas da web e devolve o texto limpo; faz buscas e extrai dados de vários sites.</li>
+<li><strong>Claude Docs</strong>: documentos editáveis criados pelo Claude, que outras pessoas podem ler e comentar.</li>
+</ul>
+<p><strong>Cuidados:</strong> conecte só o que precisa; deixe em "pedir aprovação" as ações que enviam ou apagam (mandar e-mail, apagar arquivo); Firecrawl e Perplexity exigem conta própria e podem ter custo; cuidado com dados de clientes.</p>
+<p class="rodape">Para salvar em PDF: Ctrl+P (no Mac, Cmd+P) e escolha "Salvar como PDF".</p>
+</main>
+</body>
+</html>
